@@ -1,6 +1,11 @@
 
 #include <Wire.h>
-#include <avr/pgmspace.h>
+#if defined( ESP8266 )
+  #include <pgmspace.h>
+#else
+  #include <avr/pgmspace.h>
+#endif
+
 #include <OLED12864.h>
 
 uint16_t OLED12864::fillBuffer(uint8_t c, uint16_t startPos, uint16_t endPos)

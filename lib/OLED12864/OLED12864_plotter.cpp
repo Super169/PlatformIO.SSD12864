@@ -1,5 +1,11 @@
 #include <Wire.h>
-#include <avr/pgmspace.h>
+
+#if defined( ESP8266 )
+	#include <pgmspace.h>
+#else
+	#include <avr/pgmspace.h>
+#endif
+
 #include <OLED12864.h>
 
 

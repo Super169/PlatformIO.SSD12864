@@ -3,7 +3,13 @@
 //
 //
 #include <Wire.h>
-#include <avr/pgmspace.h>
+
+#if defined( ESP8266 )
+	#include <pgmspace.h>
+#else
+	#include <avr/pgmspace.h>
+#endif
+
 #include <OLED12864.h>
 
 void OLED12864::initialization(uint8_t chipset, boolean enableBuffer, boolean directDraw)

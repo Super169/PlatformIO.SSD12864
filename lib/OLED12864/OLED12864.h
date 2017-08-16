@@ -1,7 +1,11 @@
 #ifndef _OLED12864_H_
 #define _OLED12864_H_
 
+#if defined( ESP8266 )
+#include <pgmspace.h>
+#else
 #include <avr/pgmspace.h>
+#endif
 #include "Arduino.h"
 
 // #########################################################################################################

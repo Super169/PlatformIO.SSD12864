@@ -1,7 +1,12 @@
 #define __PROG_TYPES_COMPAT__
-#include <avr/pgmspace.h>
 
-// About changes of PROGMEM
+#if defined( ESP8266 )
+  #include <pgmspace.h>
+#else
+  #include <avr/pgmspace.h>
+#endif
+
+ // About changes of PROGMEM
 //   1.6.0: https://github.com/arduino/Arduino/wiki/1.6-Frequently-Asked-Questions
 //   1.6.5: http://forum.arduino.cc/index.php?topic=339011.0
 
