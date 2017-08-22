@@ -106,9 +106,9 @@ void loop()
 
 //  demoNumeric();      
 
-  demoBITMAP();   
+//  demoBITMAP();   
   
-//  demoDrawing();      // TODO: Error after running this demo with ESP8266
+  demoDrawing();      // TODO: Error after running this demo with ESP8266
 
 //  demoPlotter();      // problem in ESP8266 // Error after running, cannot reset
 
@@ -294,6 +294,12 @@ void demoDrawing()
   showDemoText(TN_DRAWING);
   unsigned long t = micros();  
 
+  myOLED.clr();
+  myOLED.drawRect(64,0,127,31,0,1);
+  myOLED.drawRect(0,32,63,63,0,1);
+  myOLED.drawRect(0,0,127,63,0,0);
+  myOLED.drawRect(1,1,126,62,1,0);
+  /*
   drawBase();
 
   myOLED.drawVLine(16, 8,56,0);
@@ -311,10 +317,11 @@ void demoDrawing()
   myOLED.drawHLine(16, 111, 40, 0);
   myOLED.drawHLine(16, 111, 48, 1);
   myOLED.drawHLine(16, 111, 56, 2);
-
+*/
   unsigned long d1, d2;  
   d1 = micros() - t;  
 
+Serial.println("Go show");
   OLEDshow();
   d2 = micros() - t - d1;  
   Serial.print("testLine: ");
@@ -324,7 +331,7 @@ void demoDrawing()
   
   delay(2000);
 
-  demoRect();
+//  demoRect();
 }
 
 
