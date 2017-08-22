@@ -227,17 +227,24 @@ class OLED12864 {
           {printFlashMsg(_cursor.x, (_cursor.y / OLED_LINE_HEIGHT), msgptr);}
 		void printlnFlashMsg(const char* msgptr) 
           {printFlashMsg(msgptr); println();}
-    
-
-		void printFlashMsgArr(uint8_t x, uint8_t line, const char* const* msg) 
-          { return printFlashMsg(x, line, (char *) pgm_read_word(msg)); }
+/*	
+		void printFlashMsgArr(uint8_t x, uint8_t line, const char** msgArr, int idx) 
+			{printFlashMsg(x, line, msgArr[idx]);}
+		void printlnFlashMsgArr(uint8_t x, uint8_t line, const char** msgArr, int idx) 
+			{printFlashMsg(x, line, msgArr[idx]); println();}
+		void printFlashMsgArr(const char** msgArr, int idx) 
+			{ printFlashMsg(_cursor.x, (_cursor.y / OLED_LINE_HEIGHT), msgArr[idx]);}
+		void printlnFlashMsgArr(const char** msgArr, int idx) 
+			{ printFlashMsg(_cursor.x, (_cursor.y / OLED_LINE_HEIGHT), msgArr[idx]); println();}
+*/
+/*
 		void printlnFlashMsgArr(uint8_t x, uint8_t line, const char* const* msg) 
           { printFlashMsg(x, line, (char *) pgm_read_word(msg)); println(); }
 		void printFlashMsgArr(const char* const* msg) 
           { printFlashMsg(_cursor.x, (_cursor.y / OLED_LINE_HEIGHT), (char *) pgm_read_word(msg));}
 		void printlnFlashMsgArr(const char* const* msg) 
           { printFlashMsg(_cursor.x, (_cursor.y / OLED_LINE_HEIGHT), (char *) pgm_read_word(msg)); println();}
-
+*/
 		void println(uint8_t x, uint8_t line, const char ch[]) { print(x, line, ch); println(); }
 		void println(const char ch[]) { print(_cursor.x, (_cursor.y / OLED_LINE_HEIGHT), ch); println(); }
 		

@@ -24,27 +24,25 @@ char sram_welcomeMsg[] = "This is a tesing for OLED12864 Library, it will demons
 const char font_demo_small[] PROGMEM = "Small: 6x8: Abc";
 const char font_demo_large[] PROGMEM = "Large: 8x16: Abc";
 
+static const char msg_1[] PROGMEM = "[1] A long message is memory consumption, it's suggested to put them in flash memory instead of SRAM";
+static const char msg_2[] PROGMEM = "[2] By using the flash, a long message can be stored for display.";
+static const char msg_3[] PROGMEM = "[3] Another dummy long long long long long text in Flash, it can be much longer than the one in SRAM.  As the flash memory can have 32KB while SRAM only have 2KB,  it's recommended to use flash instead of SRAM for static text.  Good luck!";
 
-const char msg_1[] PROGMEM = "[1] A long message is memory consumption, it's suggested to put them in flash memory instead of SRAM";
-const char msg_2[] PROGMEM = "[2] By using the flash, a long message can be stored for display.";
-const char msg_3[] PROGMEM = "[3] Another dummy long long long long long text in Flash, it can be much longer than the one in SRAM.  As the flash memory can have 32KB while SRAM only have 2KB,  it's recommended to use flash instead of SRAM for static text.  Good luck!";
-
-const char * const textmsg[] PROGMEM  = {msg_1, msg_2, msg_3};
+static const char * textmsg[] = {msg_1, msg_2, msg_3};
 // const char const * textmsg[] PROGMEM  = {msg_1, msg_2, msg_3};
 
-const char tname_0[] PROGMEM = "Demonstration on";
-const char tname_1[] PROGMEM = "Embeded Fonts";
-const char tname_2[] PROGMEM = "User Defined Font";
-const char tname_3[] PROGMEM = "Scrolling Display";
-const char tname_4[] PROGMEM = "Bitmap Display";
-const char tname_5[] PROGMEM = "Simple Drawing";
-const char tname_6[] PROGMEM = "Plotter";
-const char tname_7[] PROGMEM = "Numeric Display";
-const char tname_8[] PROGMEM = "Mixed Display";
-const char tname_9[] PROGMEM = "DirectDraw";
+static const char tname_0[] PROGMEM = "Demonstration on";
+static const char tname_1[] PROGMEM = "Embeded Fonts";
+static const char tname_2[] PROGMEM = "User Defined Font";
+static const char tname_3[] PROGMEM = "Scrolling Display";
+static const char tname_4[] PROGMEM = "Bitmap Display";
+static const char tname_5[] PROGMEM = "Simple Drawing";
+static const char tname_6[] PROGMEM = "Plotter";
+static const char tname_7[] PROGMEM = "Numeric Display";
+static const char tname_8[] PROGMEM = "Mixed Display";
+static const char tname_9[] PROGMEM = "DirectDraw";
 
-const char * const tname[] PROGMEM  = {tname_0, tname_1, tname_2, tname_3, tname_4, tname_5, tname_6, tname_7, tname_8, tname_9};
-// const char const * tname[] PROGMEM  = {tname_0, tname_1, tname_2, tname_3, tname_4, tname_5, tname_6, tname_7, tname_8, tname_9};
+static const char * tname[] = {tname_0, tname_1, tname_2, tname_3, tname_4, tname_5, tname_6, tname_7, tname_8, tname_9};
 
 #define TN_HEADER   0
 #define TN_FONT     1
@@ -68,8 +66,10 @@ OLED12864 myOLED(OLED_1306i2c, enableBuffer, directDraw);
 void setup()
 {
   
-  Serial.begin(57600);
+  Serial.begin(115200);
   delay(1000);
+  Serial.println();
+  Serial.println();
   Serial.println("OLED12864 Tester");
 
   randomSeed(analogRead(0));  
@@ -77,10 +77,12 @@ void setup()
   checkMemory();
 
   myOLED.begin();
+  Serial.println();
+  Serial.println("Let's go");
 
   welcome();
-
-  checkMemory();
+  
+  // checkMemory();
 
 }
 
@@ -91,28 +93,34 @@ void checkMemory() {
 
 void loop()
 {
+  Serial.println();
+  Serial.println("loop started");
 
   myOLED.clr();
 
-  demoFont();
+//  demoFont();
+  
+//  demoUDF();
+  
+//  demoText();
 
-  demoUDF();
+//  demoNumeric();      
 
-  demoText();
+  demoBITMAP();   
+  
+//  demoDrawing();      // TODO: Error after running this demo with ESP8266
 
-  demoNumeric();
+//  demoPlotter();      // problem in ESP8266 // Error after running, cannot reset
 
-  demoBITMAP();
-
-  demoDrawing();
-
-  demoPlotter();
-
-  demoDirectDraw();
+//  demoDirectDraw();   // problem in ESP8266  // Error after running, cannot reset
 
   checkMemory();
 
-  delay(2000);
+  Serial.println();
+  Serial.println("loop completed");
+  Serial.println();
+  Serial.println("Wait for next round");
+  delay(5000);
 
 }
 
@@ -121,11 +129,10 @@ void welcome()
   myOLED.clr();
   OLEDshow();
   myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsg(0,0,(char *) msg_welcomeHeader);
-  myOLED.printFlashMsg(0,3,(char *) msg_welcomeMsg);
+  myOLED.printFlashMsg(0,0, msg_welcomeHeader);
+  myOLED.printFlashMsg(0,3, msg_welcomeMsg);
   OLEDshow();
   delay(3000);
-
 }
 
 void showDemoText(uint8_t tcode)
@@ -134,12 +141,26 @@ void showDemoText(uint8_t tcode)
   myOLED.clr();
   OLEDshow();
   myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsgArr(0,1, &(tname[TN_HEADER]));
-  myOLED.printFlashMsgArr(0,4, &(tname[tcode]));
+  myOLED.printFlashMsg(0,1, tname[TN_HEADER]);
+  myOLED.printFlashMsg(0,4, tname[tcode]);
   OLEDshow();
   delay(1000);
   myOLED.clr();
   OLEDshow();
+}
+
+void showBar(uint8_t val) 
+{
+  boolean b = myOLED.setDirectDraw(false);
+  myOLED.clr(2);
+  myOLED.drawRect(0,16,127,23, OLED_MODE_DRAW, OLED_STYLE_EMPTY);
+  myOLED.drawRect(0,17,val,22, OLED_MODE_DRAW, OLED_STYLE_FILL);
+  myOLED.show(2);
+  myOLED.setDirectDraw(b);
+}
+
+void OLEDshow() {
+  if (!directDraw) myOLED.show();
 }
 
 void demoFont() 
@@ -148,7 +169,7 @@ void demoFont()
   showDemoText(TN_FONT);
 
   myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsgArr(0,0, &(tname[TN_FONT]));
+  myOLED.printFlashMsg(0,0, tname[TN_FONT]);
 
   myOLED.setFont(OLED_font6x8);
   myOLED.printFlashMsg(0, 2, (char *) font_demo_small);
@@ -175,7 +196,7 @@ void demoUDF()
   showDemoText(TN_UDF);
   char msg[6] = {0x10, 0x11, 0x12, 0x13, 0x14, 0x00};
   myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsgArr(0,0, &(tname[TN_UDF]));
+  myOLED.printFlashMsg(0,0, tname[TN_UDF]);
   myOLED.setFont(CN16x16, false);
   for (int i=2; i < 7; i += 2) myOLED.print((i-2) * 10, i, msg);
   OLEDshow();
@@ -186,7 +207,7 @@ void demoText()
 {
   showDemoText(TN_TEXT);
   myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsgArr(0,0, &(tname[TN_TEXT]));
+  myOLED.printFlashMsg(0,0, tname[TN_TEXT]);
 
 //  char num[] = "12345";
 //  Comment out this long text to save memory
@@ -195,11 +216,11 @@ void demoText()
 
   myOLED.setFont(OLED_font6x8);
   for (int i = 0; i < 3; i++)
-    myOLED.printFlashMsgArr(&(textmsg[i]));
+    myOLED.printFlashMsg(textmsg[i]);
 
   myOLED.setFont(OLED_font8x16);
   for (int i = 0; i < 3; i++)
-    myOLED.printFlashMsgArr(&(textmsg[i]));
+    myOLED.printFlashMsg(textmsg[i]);
   OLEDshow();
   delay(3000);
 
@@ -211,7 +232,7 @@ void demoNumeric()
   showDemoText(TN_NUMERIC);
 
   myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsgArr(0,0, &(tname[TN_NUMERIC]));
+  myOLED.printFlashMsg(0,0, tname[TN_NUMERIC]);
   
   myOLED.print(0, 2, (long) random(0,1000000), 0, false);
   myOLED.print(64, 2, (int) random(0,32767), 5, true);
@@ -232,21 +253,11 @@ void demoNumeric()
   myOLED.print(":");
   myOLED.printHex(0xF, 4, true);
 
-/*
-  myOLED.setFont(OLED_fontBigNum);
-  for (int i= 0; i < 100; i++) 
-  {
-    myOLED.print(64, 5, i, 4);
-    delay((i < 10 ? 200 : ( i < 30 ? 50 : 0)));
-  }
-  delay(1000);
-*/  
   // to verify the buffer
   OLEDshow();
   delay(3000);
   
 }
-
 
 void demoBITMAP() 
 {
@@ -343,6 +354,8 @@ void demoRect()
 void demoPlotter()
 {
   showDemoText(TN_PLOTTER);
+  myOLED.clr();
+
   myOLED.plotter(-100,100,-20,120,0,0,true);
   myOLED.plotterDraw(0,100);
   myOLED.plotterDrawTo(60,0);
@@ -359,9 +372,9 @@ void demoPlotter()
 void demoMix()
 {
   showDemoText(TN_NUMERIC);
-
+  
   myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsgArr(0,0, &(tname[TN_NUMERIC]));
+  myOLED.printFlashMsg(0,0, tname[TN_NUMERIC]);
   
   myOLED.print(0, 2, (long) random(0,1000000), 0, false);
   myOLED.print(64, 2, (int) random(0,32767), 5, true);
@@ -382,15 +395,6 @@ void demoMix()
   myOLED.print(":");
   myOLED.printHex(0xF, 4, true);
 
-/*
-  myOLED.setFont(OLED_fontBigNum);
-  for (int i= 0; i < 100; i++) 
-  {
-    myOLED.print(64, 5, i, 4);
-    delay((i < 10 ? 200 : ( i < 30 ? 50 : 0)));
-  }
-  delay(1000);
-*/  
   // to verify the buffer
   OLEDshow();
   delay(3000);
@@ -410,18 +414,4 @@ void demoDirectDraw()
     showBar(i);
   }
   delay(3000);
-}
-
-void showBar(uint8_t val) 
-{
-  boolean b = myOLED.setDirectDraw(false);
-  myOLED.clr(2);
-  myOLED.drawRect(0,16,127,23, OLED_MODE_DRAW, OLED_STYLE_EMPTY);
-  myOLED.drawRect(0,17,val,22, OLED_MODE_DRAW, OLED_STYLE_FILL);
-  myOLED.show(2);
-  myOLED.setDirectDraw(b);
-}
-
-void OLEDshow() {
-  if (!directDraw) myOLED.show();
 }
