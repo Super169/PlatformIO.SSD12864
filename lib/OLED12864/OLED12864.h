@@ -81,16 +81,16 @@ static	uint8_t  _invalidChar = 0x00;
 // 10xb - Page addressing mode (PAGESTART, LOWCOLUMN, HIGHCOLUMN)
 // 00xb - Horizontal addressing mode
 // 01xb - Vertical addressing mode
-#define OLED_HORIZONTAL_ADDRESSING			0x00    // 00xb
-#define OLED_VERTICAL_ADDRESSING				0x01    // 01xb
-#define OLED_PAGE_ADDRESSING						0x02    // 10xb
+#define OLED_HORIZONTAL_ADDRESSING	0x00    // 00xb
+#define OLED_VERTICAL_ADDRESSING	0x01    // 01xb
+#define OLED_PAGE_ADDRESSING		0x02    // 10xb
 
 #define OLED_CMD_COLUMNADDRESS 		0x21
 #define OLED_CMD_PAGEADDRESS   		0x22
 #define OLED_CMD_STARTPAGE     		0xB0    // B0 - B7 (i.e. page start)
 
 
-#define OLED_CMD_DISPLAYCLOCK			0xD5
+#define OLED_CMD_DISPLAYCLOCK		0xD5
 #define OLED_CMD_MULTIPLEXRATIO		0xA8
 #define OLED_CMD_DISPLAYOFFSET		0xD3
 
@@ -99,8 +99,7 @@ static	uint8_t  _invalidChar = 0x00;
 #define OLED_CMD_1106_PUMPVOLTAGE	0x30
 #define OLED_CMD_1106_DCCONTROL		0xAD
 #define	OLED_CMD_1306_CHARGEPUMP	0x8D
-
-
+#define	OLED_CMD_1306_SETPRECHARGE	0xD9
 
 #define swap(a, b) { int16_t t = a; a = b; b = t; }
 
@@ -253,7 +252,8 @@ class OLED12864 {
 		void printNum(uint8_t x, uint8_t line, long n, uint8_t base, uint8_t width, boolean fillZero);
 		void printNum(uint8_t x, uint8_t line, long n, uint8_t base, uint8_t width) { return printNum(x, line, n, base, width, false); }
 		void printNum(uint8_t x, uint8_t line, long n, uint8_t base) { return printNum(x, line, n, base, 0, false); }
-
+		void printNum(uint8_t x, uint8_t line, long n) { return printNum(x, line, n, 10, 0, false); }
+		
 		// All integer type go to long
 		//
 //		void print(uint8_t x, uint8_t line, int n, uint8_t width, boolean fillZero) {return printNum(x, line, n, 10, width, fillZero); }

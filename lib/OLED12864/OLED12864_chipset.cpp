@@ -76,19 +76,27 @@ void OLED12864::begin()
 		//	Initialization from 1.3 OLED library for SSD1106 (I2C_with_Wire)
 		//		[AE],[02],[10],[40],[B0],[81,80],[A1],[A6],[A8,3F],[AD,8B],[30],[C8],[D3,00],[D5,80],[D9,1F],[DA,12],[DB,40],[AF]
 		//
-		//  Initialization from AdaFruit SSD1306, 12864, with SSD1306_SWITCHCAPVCC (Adafruit_SSD1306)
-		//    [AE],[D5,80],[A8,3F],[D3,00],[40],[8D,14],[20,00],[A1],[C8],[DA,12],[81,CF],[D9,22],[DB,40],[A4],[A6],[AF]
-		//
 		//  Initialization from 0.96 OLED software I2C (IIC_without_ACK_2)
 		//		[AE],[00],[10],[40],[81,CF],[A1],[C8],[A6],[A8,3F],[D3,00],[D5,80],[D9,F1],[DA,12],[DB,40],[20,02],[8D,14],[A4],[A6],[AF]
 		//
+		//  Initialization from AdaFruit SSD1306, 12864, with SSD1306_SWITCHCAPVCC (Adafruit_SSD1306)
+		//    [AE],[D5,80],[A8,3F],[D3,00],[40],[8D,14],[20,00],[A1],[C8],[DA,12],[81,CF],[D9,F1],[DB,40],[A4],[A6],[AF]
+		//    [AE],[D5,80],[A8,3F],[D3,00],[40],[8D,14],[20,00],[A1],[C8],[DA,12],[81,CF],[D9,F1],[DB,40],[A4],[A6],[2E],[AF]
+		//
+		//
 		//	Common Settings (exclude AE & AF which just turn OFF/ON the display):
-		//		[A8,3F],[D3,00][40][A1][C8][A6][D5,80]
+		//		[A8,3F]		- Set multiplex to screen lcd height - 1, i.e. 3F
+		//		[D3,00]		- Set display offset, i.e. 0 = no offset
+		//		[40]		- Set start line (0x40 | line#), i.e.  0 = start from line #0
+		//		[A1]		- Set reg map (0xA0 | 0x01)
+		//		[C8]		- COMSCANDEC
+		//		[A6]		- NORMALDISPLAY
+		//		[D5,80]		- SETDISPLAYCLOCKDIV , 80 is recommended 
 		//
 		//	General Settings which not appear in all, but no harm to add, better add them for initialization
-		//		[DA,12]				- Only the sample is set to 02
-		//		[81,7F/80/CF] - Set contrast (set to CF for brighter level, change it if needed)
-		//		[00][10]			- Set column to 0x00  (seems to be problem in SH1106, it has to set column to 0x02 (column #2)
+		//		[DA,12]			- Only the sample is set to 02 (SETCOMPINS)
+		//		[81,7F/80/CF] 	- Set contrast (set to CF for brighter level, change it if needed)
+		//		[00][10]		- Set column to 0x00  (seems to be problem in SH1106, it has to set column to 0x02 (column #2)
 		//		[B0]					- Set to page #0 (i.e. line 0)
 		//		[A4]					- Entire Display ON
 		//		[DB,40]				- Only missing in sample, for setting VCOM deselect level
@@ -112,7 +120,7 @@ void OLED12864::begin()
 		//
 		//		Final initialization setting
 		//			[AE],[A8,3F],[D3,00][40][A1][C8][A6][D5,80],[DA,12],[81,CF][00][10][B0][A4][DB,40][20,00]...[AF]
-		//			- for SH1106:		[30][AD,8B]
+		//			- for SH1106:	[30][AD,8B]
 		//			- for SSD1306:	[8D,14]
 		//
 	
@@ -124,16 +132,18 @@ void OLED12864::begin()
 				sendCommand(OLED_CMD_DISPLAYOFF);                   // 0xAE (turn off the display during initialization
 				
 				sendCommand(OLED_CMD_MULTIPLEXRATIO);               // 0xA8
-				sendCommand(0x3F);																	// Default 63 (0x3F)
+				sendCommand(0x3F);									// Default 63 (0x3F)
 				
 				sendCommand(OLED_CMD_DISPLAYOFFSET);              	// 0xD3
 				sendCommand(0x00);                                  // Reset offset to 0
 
-				sendCommand(OLED_CMD_STARTLINE); 										// 40h 
+				sendCommand(OLED_CMD_STARTLINE | 0x00); 			// 40h 
+
+
 
 				// Segment re-map is required in OLED
-				sendCommand(OLED_CMD_SEGREMAP | 0x01);							// A1h	
-				sendCommand(OLED_CMD_SCANREMAP);										// C8h	
+				sendCommand(OLED_CMD_SEGREMAP | 0x01);				// A1h	
+				sendCommand(OLED_CMD_SCANREMAP);					// C8h	
 
 				sendCommand(OLED_CMD_NORMALDISPLAY);								// A6h
 				
@@ -172,50 +182,53 @@ void OLED12864::begin()
 			case OLED_1306i2c:
 
 				sendCommand(OLED_CMD_DISPLAYOFF);                   // 0xAE (turn off the display during initialization
-				
+
+				sendCommand(OLED_CMD_DISPLAYCLOCK);					// D5h
+				sendCommand(0x80);									// 0x80
+	
 				sendCommand(OLED_CMD_MULTIPLEXRATIO);               // 0xA8
 				sendCommand(0x3F);																	// Default 63 (0x3F)
 				
 				sendCommand(OLED_CMD_DISPLAYOFFSET);              	// 0xD3
 				sendCommand(0x00);                                  // Reset offset to 0
 
-				sendCommand(OLED_CMD_STARTLINE); 										// 40h 
+				sendCommand(OLED_CMD_STARTPAGE ); 					// 0xB0 - page 0
+				
+				sendCommand(OLED_CMD_STARTLINE | 0x00); 			// 40h 
 
-				// Segment re-map is required in OLED
-				sendCommand(OLED_CMD_SEGREMAP | 0x01);							// A1h	
-				sendCommand(OLED_CMD_SCANREMAP);										// C8h	
-
-				sendCommand(OLED_CMD_NORMALDISPLAY);								// A6h
-				
-				sendCommand(OLED_CMD_DISPLAYCLOCK);									// D5h
-				sendCommand(0x80);																	// 0x80
-				
-				sendCommand(OLED_CMD_COMPIN);												// DAh
-				sendCommand(0x12);																	// 0x12
-				
-				sendCommand(OLED_CMD_CONTRAST);											// 81h
-				sendCommand(0xCF);																	// Default mid-level, change it if needed
-
-				sendCommand(OLED_CMD_STARTPAGE ); 									// 0xB0 - page 0 (i.e. line 0)
-
-				sendCommand(OLED_CMD_RESUMEDISPLAY);								// A4h
-				
-				sendCommand(OLED_CMD_SETVCOMDETECT);								// DBh
-				sendCommand(0x40);																	// 0x40
-				
 				_colOffset = 0;	
+				sendCommand(OLED_CMD_LOWCOLUMN );  					// 0x00 - low col = 0
+				sendCommand(OLED_CMD_HIGHCOLUMN );  				// 0x10 - hi col = 0
+				
+				sendCommand(OLED_CMD_1306_CHARGEPUMP);				// 8Dh
+				sendCommand(0x14);									// 0x14
+
 				sendCommand(OLED_CMD_1306_ADDRESSMODE);        		// 20h
-				sendCommand(OLED_HORIZONTAL_ADDRESSING);          // 0x00 - Good for filling buffers
-				sendCommand(OLED_CMD_LOWCOLUMN );  								// 0x00 - low col = 0
-				sendCommand(OLED_CMD_HIGHCOLUMN );  							// 0x10 - hi col = 0
-				sendCommand(OLED_CMD_1306_CHARGEPUMP);						// 8Dh
-				sendCommand(0x14);																// 0x14
+				sendCommand(OLED_HORIZONTAL_ADDRESSING);          	// 0x00 - Good for filling buffers
 				
-				sendCommand(OLED_CMD_DEACTIVATESCROLL);							// Deactivate scrolling if any
+				// Segment re-map is required in OLED
+				sendCommand(OLED_CMD_SEGREMAP | 0x01);				// A1h	
+				sendCommand(OLED_CMD_SCANREMAP);					// C8h	
+
+				sendCommand(OLED_CMD_COMPIN);						// DAh
+				sendCommand(0x12);									// 0x12
+
+				sendCommand(OLED_CMD_CONTRAST);						// 81h
+				sendCommand(0xCF);									// Default mid-level, change it if needed
+
+				sendCommand(OLED_CMD_1306_SETPRECHARGE);			// D9h
+				sendCommand(0xF1);									// 
+
+				sendCommand(OLED_CMD_SETVCOMDETECT);				// DBh
+				sendCommand(0x40);									// 0x40
 				
-				sendCommand(OLED_CMD_DISPLAYON);										// A6h (turn on the display)
+				sendCommand(OLED_CMD_RESUMEDISPLAY);				// A4h
+				sendCommand(OLED_CMD_NORMALDISPLAY);				// A6h
 				
-				sendCommand(OLED_CMD_DISPLAYON);										// 0xAF
+				sendCommand(OLED_CMD_DEACTIVATESCROLL);				// Deactivate scrolling if any
+				
+			
+				sendCommand(OLED_CMD_DISPLAYON);					// 0xAF
 				
 				break;
 

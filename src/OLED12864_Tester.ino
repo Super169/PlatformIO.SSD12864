@@ -63,6 +63,7 @@ boolean directDraw = true;
 //  OLED_1106i2c - 1.3" OLED
 OLED12864 myOLED(OLED_1306i2c, enableBuffer, directDraw);
 
+
 void setup()
 {
   
@@ -95,24 +96,26 @@ void loop()
 {
   Serial.println();
   Serial.println("loop started");
-
+  
+  myOLED.setDirectDraw(directDraw);
   myOLED.clr();
+  myOLED.show();
 
-//  demoFont();
+  demoFont();
   
-//  demoUDF();
+  demoUDF();
   
-//  demoText();
+  demoText();
 
-//  demoNumeric();      
+  demoNumeric();      
 
-//  demoBITMAP();   
+  demoBitmap();   
   
   demoDrawing();      // TODO: Error after running this demo with ESP8266
 
-//  demoPlotter();      // problem in ESP8266 // Error after running, cannot reset
+  demoPlotter();      // problem in ESP8266 // Error after running, cannot reset
 
-//  demoDirectDraw();   // problem in ESP8266  // Error after running, cannot reset
+  demoDirectDraw();   // problem in ESP8266  // Error after running, cannot reset
 
   checkMemory();
 
@@ -137,7 +140,9 @@ void welcome()
 
 void showDemoText(uint8_t tcode)
 {
-  Serial.println("showDemoText");
+  Serial.print("showDemoText - ");
+  Serial.print(tcode);
+  Serial.println();
   myOLED.clr();
   OLEDshow();
   myOLED.setFont(OLED_font6x8);
@@ -149,276 +154,17 @@ void showDemoText(uint8_t tcode)
   OLEDshow();
 }
 
-void showBar(uint8_t val) 
-{
-  boolean b = myOLED.setDirectDraw(false);
-  myOLED.clr(2);
-  myOLED.drawRect(0,16,127,23, OLED_MODE_DRAW, OLED_STYLE_EMPTY);
-  myOLED.drawRect(0,17,val,22, OLED_MODE_DRAW, OLED_STYLE_FILL);
-  myOLED.show(2);
-  myOLED.setDirectDraw(b);
-}
-
 void OLEDshow() {
   if (!directDraw) myOLED.show();
 }
 
-void demoFont() 
-{
-  Serial.println("demoFont");
-  showDemoText(TN_FONT);
-
-  myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsg(0,0, tname[TN_FONT]);
-
-  myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsg(0, 2, (char *) font_demo_small);
-  myOLED.print(0, 5, "1234");
-
-  myOLED.setFont(OLED_font8x16);
-  myOLED.printFlashMsg(0, 3, (char *) font_demo_large);
-
-  myOLED.setFont(OLED_fontNum);
-  myOLED.print(0, 6, "1234");
-
-  myOLED.setFont(OLED_fontBigNum);
-  myOLED.setInverse(true);
-  myOLED.print(64, 5, "1234");
-  myOLED.setInverse(false);
-
-  OLEDshow();
-  delay(3000);
-}
 
 
-void demoUDF() 
-{
-  showDemoText(TN_UDF);
-  char msg[6] = {0x10, 0x11, 0x12, 0x13, 0x14, 0x00};
-  myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsg(0,0, tname[TN_UDF]);
-  myOLED.setFont(CN16x16, false);
-  for (int i=2; i < 7; i += 2) myOLED.print((i-2) * 10, i, msg);
-  OLEDshow();
-  delay(3000);
-}
-
-void demoText()
-{
-  showDemoText(TN_TEXT);
-  myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsg(0,0, tname[TN_TEXT]);
-
-//  char num[] = "12345";
-//  Comment out this long text to save memory
-//  char msg[] = "Testing on printing a very long text which require multiple scrolling and sometime it takes time to scroll the screen.";
-//  char msg[] = "A dummy long long long long text ....";
-
-  myOLED.setFont(OLED_font6x8);
-  for (int i = 0; i < 3; i++)
-    myOLED.printFlashMsg(textmsg[i]);
-
-  myOLED.setFont(OLED_font8x16);
-  for (int i = 0; i < 3; i++)
-    myOLED.printFlashMsg(textmsg[i]);
-  OLEDshow();
-  delay(3000);
-
-}
-
-
-void demoNumeric()
-{
-  showDemoText(TN_NUMERIC);
-
-  myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsg(0,0, tname[TN_NUMERIC]);
-  
-  myOLED.print(0, 2, (long) random(0,1000000), 0, false);
-  myOLED.print(64, 2, (int) random(0,32767), 5, true);
-  myOLED.println(0, 3, "1.2345: (2) : (5,8)");
-  myOLED.printFloat(1.2345,2);
-  myOLED.print(" : ");
-  myOLED.printFloat(1.2345, 5, 8);
-  myOLED.println(0, 6, "Display HEX 0xF");
-  myOLED.printHex(0,7, 0xF, 0, false);
-  myOLED.print(":");
-  myOLED.printHex(0xF, 2, false);
-  myOLED.print(":");
-  myOLED.printHex(0xF, 2, true);
-  myOLED.print(":");
-  myOLED.printHex(0xF, 3, false);
-  myOLED.print(":");
-  myOLED.printHex(0xF, 3, true);
-  myOLED.print(":");
-  myOLED.printHex(0xF, 4, true);
-
-  // to verify the buffer
-  OLEDshow();
-  delay(3000);
-  
-}
-
-void demoBITMAP() 
-{
-  // Display BMP as font
-  showDemoText(TN_BITMAP);
-
-  myOLED.setFont(BMP12864, false);
-
-  myOLED.print(0,0, "0");
-  OLEDshow();
-  delay(2000);
-  
-  myOLED.clr();
-  OLEDshow();
-  myOLED.print(0,0, "1");
-  OLEDshow();
-  delay(2000);
-}
-
-void drawBase()
-{
-  myOLED.clr();
-  myOLED.drawRect(64,0,127,31,0,1);
-  myOLED.drawRect(0,32,63,63,0,1);
-  
-  // OuterFrame 
-  myOLED.drawRect(0,0,127,63,0,0);
-  myOLED.drawRect(1,1,126,62,1,0);
-  myOLED.drawRect(2,2,125,61,0,0);
-}
-
-void demoDrawing()
-{
-  showDemoText(TN_DRAWING);
-  unsigned long t = micros();  
-
-  myOLED.clr();
-  myOLED.drawRect(64,0,127,31,0,1);
-  myOLED.drawRect(0,32,63,63,0,1);
-  myOLED.drawRect(0,0,127,63,0,0);
-  myOLED.drawRect(1,1,126,62,1,0);
-  /*
-  drawBase();
-
-  myOLED.drawVLine(16, 8,56,0);
-  myOLED.drawVLine(32, 8,56,1);
-  myOLED.drawVLine(48, 8,56,2);
-
-  myOLED.drawVLine(79, 8,56,0);
-  myOLED.drawVLine(95, 8,56,1);
-  myOLED.drawVLine(111, 8,56,2);
-
-  myOLED.drawHLine(16, 111, 8, 0);
-  myOLED.drawHLine(16, 111, 16, 1);
-  myOLED.drawHLine(16, 111, 24, 2);
-
-  myOLED.drawHLine(16, 111, 40, 0);
-  myOLED.drawHLine(16, 111, 48, 1);
-  myOLED.drawHLine(16, 111, 56, 2);
-*/
-  unsigned long d1, d2;  
-  d1 = micros() - t;  
-
-Serial.println("Go show");
-  OLEDshow();
-  d2 = micros() - t - d1;  
-  Serial.print("testLine: ");
-  Serial.print(d1);
-  Serial.print(" : ");
-  Serial.println(d2);
-  
-  delay(2000);
-
-//  demoRect();
-}
-
-
-void demoRect()
-{
-  unsigned long t = micros();  
-  
-  drawBase();
-
-  myOLED.drawRect(16,8,111,55,0,0);
-  myOLED.drawRect(32,16,95,47,1,0);
-  myOLED.drawRect(44,20,83,43,2,1);
-  myOLED.drawRect(46,24,79,39,2,1);
-
-  unsigned long d1, d2;  
-  d1 = micros() - t;  
-  
-  OLEDshow();
-  d2 = micros() - t - d1;  
-  
-  delay(3000);
-
-  myOLED.clr();
-  OLEDshow();
-}
-
-void demoPlotter()
-{
-  showDemoText(TN_PLOTTER);
-  myOLED.clr();
-
-  myOLED.plotter(-100,100,-20,120,0,0,true);
-  myOLED.plotterDraw(0,100);
-  myOLED.plotterDrawTo(60,0);
-  myOLED.plotterDrawTo(-70,70);
-  myOLED.plotterDrawTo(70,70);
-  myOLED.plotterDrawTo(-60,0);
-  myOLED.plotterDrawTo(0,100);
-  myOLED.plotterReset();
-  for (int x = - 100; x < 100; x++) myOLED.plotterDrawTo(x, x * x / 80);
-  OLEDshow();
-  delay(3000);
-}
-
-void demoMix()
-{
-  showDemoText(TN_NUMERIC);
-  
-  myOLED.setFont(OLED_font6x8);
-  myOLED.printFlashMsg(0,0, tname[TN_NUMERIC]);
-  
-  myOLED.print(0, 2, (long) random(0,1000000), 0, false);
-  myOLED.print(64, 2, (int) random(0,32767), 5, true);
-  myOLED.println(0, 3, "1.2345: (2) : (5,8)");
-  myOLED.printFloat(1.2345,2);
-  myOLED.print(" : ");
-  myOLED.printFloat(1.2345, 5, 8);
-  myOLED.println(0, 6, "Display HEX 0xF");
-  myOLED.printHex(0,7, 0xF, 0, false);
-  myOLED.print(":");
-  myOLED.printHex(0xF, 2, false);
-  myOLED.print(":");
-  myOLED.printHex(0xF, 2, true);
-  myOLED.print(":");
-  myOLED.printHex(0xF, 3, false);
-  myOLED.print(":");
-  myOLED.printHex(0xF, 3, true);
-  myOLED.print(":");
-  myOLED.printHex(0xF, 4, true);
-
-  // to verify the buffer
-  OLEDshow();
-  delay(3000);
-  
-}
-
-void demoDirectDraw()
-{
-  showDemoText(TN_DIRECTDRAW);
-  myOLED.setDirectDraw(true);
-  myOLED.print(0,0,"DirectDraw 0.1");
-  for (int i = 0; i < 127; i++) {
-    showBar(i);
-  }
-  delay(1000);
-  for (int i = 127; i >= 0;  i--) {
-    showBar(i);
-  }
-  delay(3000);
-}
+#include "demoBitmap.ino"
+#include "demoDirectDraw.ino"
+#include "demoDrawing.ino"
+#include "demoFont.ino"
+#include "demoNumeric.ino"
+#include "demoPlotter.ino"
+#include "demoText.ino"
+#include "demoUDF.ino"
