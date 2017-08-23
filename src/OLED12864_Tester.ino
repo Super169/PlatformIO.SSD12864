@@ -57,7 +57,7 @@ static const char * tname[] = {tname_0, tname_1, tname_2, tname_3, tname_4, tnam
 
 
 boolean enableBuffer = true;
-boolean directDraw = true;
+boolean directDraw = false;
 
 //  OLED_1306i2c - 0.96" OLED
 //  OLED_1106i2c - 1.3" OLED
@@ -115,7 +115,7 @@ void loop()
 
   demoPlotter();      // problem in ESP8266 // Error after running, cannot reset
 
-  demoDirectDraw();   // problem in ESP8266  // Error after running, cannot reset
+  // demoDirectDraw();   // problem in ESP8266  // Error after running, cannot reset
 
   checkMemory();
 
