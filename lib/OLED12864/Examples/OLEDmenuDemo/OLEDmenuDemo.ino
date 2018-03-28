@@ -1,5 +1,10 @@
 #define __PROG_TYPES_COMPAT__
+
+#if defined( ESP8266 )
+#include <pgmspace.h>
+#else
 #include <avr/pgmspace.h>
+#endif
 
 const char appName[] PROGMEM = "GRBL Controller v0.1";
 
